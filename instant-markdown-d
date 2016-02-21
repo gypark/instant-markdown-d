@@ -10,6 +10,9 @@ var server = require('http').createServer(httpHandler),
     server,
     socket;
 
+// backup current output and re-emit it on reload
+var current_output;
+
 server.listen(8090);
 
 var md = new MarkdownIt({
@@ -37,7 +40,9 @@ function writeMarkdown(input, output) {
     }
   });
   input.on('end', function() {
-    output.emit('newContent', md.render(body));
+    // backup current output
+    current_output = md.render(body);
+    output.emit('newContent', current_output);
   });
 }
 
@@ -87,8 +92,14 @@ function httpHandler(req, res) {
 io.set('log level', 1);
 io.sockets.on('connection', function(sock){
   socket = sock;
-  process.stdout.write('connection established!');
-  writeMarkdown(process.stdin, socket);
+  process.stdout.write('connection established!\n');
+  // re-emit current output on browser reload (F5)
+  if ( current_output ) {
+    socket.emit('newContent', current_output);
+  }
+  else {
+    writeMarkdown(process.stdin, socket);
+  }
   process.stdin.resume();
 });
 
