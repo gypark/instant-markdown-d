@@ -12,6 +12,8 @@ var server = require('http').createServer(httpHandler),
 
 // backup current output and re-emit it on reload
 var current_output;
+// to serve static files in cwd
+var fs = require('fs');
 
 server.listen(8090);
 
@@ -58,6 +60,19 @@ function httpHandler(req, res) {
          .root(process.cwd())
          .pipe(res);
         return;
+      }
+
+      // If the file is found under CWD, server it
+      // Example: /images/img-001.jpg
+      try {
+        if ( fs.statSync(process.cwd() + '/' + req.url).isFile() ) {
+          send(req, req.url)
+           .root(process.cwd())
+           .pipe(res);
+          return;
+        }
+      }
+      catch (e) {
       }
 
       // Otherwise serve the file from the directory this module is in
