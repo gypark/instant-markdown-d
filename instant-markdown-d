@@ -104,7 +104,8 @@ function httpHandler(req, res) {
   }
 }
 
-io.set('log level', 1);
+// remove warning about setting log level
+// io.set('log level', 1);
 io.sockets.on('connection', function(sock){
   socket = sock;
   process.stdout.write('connection established!\n');
