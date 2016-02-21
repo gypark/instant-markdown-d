@@ -96,6 +96,10 @@ io.sockets.on('connection', function(sock){
 if (process.platform.toLowerCase().indexOf('darwin') >= 0){
   exec('open -g http://localhost:8090', function(error, stdout, stderr){});
 }
+// In windows, use start
+else if (process.platform.toLowerCase().indexOf('win32') >= 0) {
+  exec('start http://localhost:8090', function(error, stdout, stderr){});
+}
 else {  // assume unix/linux
   exec('xdg-open http://localhost:8090', function(error, stdout, stderr){});
 }
